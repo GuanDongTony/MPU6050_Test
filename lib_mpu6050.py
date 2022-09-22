@@ -156,7 +156,7 @@ class mpu6050:
 
 
     def read_gyro_range(self, raw = False):
-       raw_data = self.bus.read_byte_data(self.address, self.GYRO_CONFIG)
+        raw_data = self.bus.read_byte_data(self.address, self.GYRO_CONFIG)
 
         if raw is True:
             return raw_data
