@@ -1,7 +1,7 @@
-import lib_mpu6050 as mpu6050
+import lib_mpu6050 as lib
 
 if __name__ == "__main__":
-    mpu = mpu6050(0x68)
+    mpu = lib.mpu6050(0x68)
     #print(mpu.get_temp())
     accel_data = mpu.get_accel_data()
     print(accel_data['x'])

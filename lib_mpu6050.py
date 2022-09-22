@@ -1,13 +1,3 @@
-"""
-This program handles the communication over I2C
-between a Raspberry Pi and a MPU-6050 Gyroscope / Accelerometer combo.
-
-Released under the MIT License
-Copyright (c) 2015, 2016, 2017, 2021 Martijn (martijn@mrtijn.nl) and contributers
-
-https://github.com/m-rtijn/mpu6050
-"""
-
 import smbus
 
 class mpu6050:
@@ -74,11 +64,6 @@ class mpu6050:
     # I2C communication methods
 
     def read_i2c_word(self, register):
-        """Read two i2c registers and combine them.
-
-        register -- the first register to read from.
-        Returns the combined read results.
-        """
         # Read the data from the registers
         high = self.bus.read_byte_data(self.address, register)
         low = self.bus.read_byte_data(self.address, register + 1)
@@ -93,10 +78,6 @@ class mpu6050:
     # MPU-6050 Methods
 
     def get_temp(self):
-        """Reads the temperature from the onboard temperature sensor of the MPU-6050.
-
-        Returns the temperature in degrees Celcius.
-        """
         raw_temp = self.read_i2c_word(self.TEMP_OUT0)
 
         # Get the actual temperature using the formule given in the
@@ -106,11 +87,6 @@ class mpu6050:
         return actual_temp
 
     def set_accel_range(self, accel_range):
-        """Sets the range of the accelerometer to range.
-
-        accel_range -- the range to set the accelerometer to. Using a
-        pre-defined range is advised.
-        """
         # First change it to 0x00 to make sure we write the correct value later
         self.bus.write_byte_data(self.address, self.ACCEL_CONFIG, 0x00)
 
@@ -118,13 +94,6 @@ class mpu6050:
         self.bus.write_byte_data(self.address, self.ACCEL_CONFIG, accel_range)
 
     def read_accel_range(self, raw = False):
-        """Reads the range the accelerometer is set to.
-
-        If raw is True, it will return the raw value from the ACCEL_CONFIG
-        register
-        If raw is False, it will return an integer: -1, 2, 4, 8 or 16. When it
-        returns -1 something went wrong.
-        """
         raw_data = self.bus.read_byte_data(self.address, self.ACCEL_CONFIG)
 
         if raw is True:
@@ -142,12 +111,6 @@ class mpu6050:
                 return -1
 
     def get_accel_data(self, g = False):
-        """Gets and returns the X, Y and Z values from the accelerometer.
-
-        If g is True, it will return the data in g
-        If g is False, it will return the data in m/s^2
-        Returns a dictionary with the measurement results.
-        """
         x = self.read_i2c_word(self.ACCEL_XOUT0)
         y = self.read_i2c_word(self.ACCEL_YOUT0)
         z = self.read_i2c_word(self.ACCEL_ZOUT0)
@@ -180,11 +143,6 @@ class mpu6050:
             return {'x': x, 'y': y, 'z': z}
 
     def set_gyro_range(self, gyro_range):
-        """Sets the range of the gyroscope to range.
-
-        gyro_range -- the range to set the gyroscope to. Using a pre-defined
-        range is advised.
-        """
         # First change it to 0x00 to make sure we write the correct value later
         self.bus.write_byte_data(self.address, self.GYRO_CONFIG, 0x00)
 
@@ -192,21 +150,13 @@ class mpu6050:
         self.bus.write_byte_data(self.address, self.GYRO_CONFIG, gyro_range)
 
     def set_filter_range(self, filter_range=FILTER_BW_256):
-        """Sets the low-pass bandpass filter frequency"""
         # Keep the current EXT_SYNC_SET configuration in bits 3, 4, 5 in the MPU_CONFIG register
         EXT_SYNC_SET = self.bus.read_byte_data(self.address, self.MPU_CONFIG) & 0b00111000
         return self.bus.write_byte_data(self.address, self.MPU_CONFIG,  EXT_SYNC_SET | filter_range)
 
 
     def read_gyro_range(self, raw = False):
-        """Reads the range the gyroscope is set to.
-
-        If raw is True, it will return the raw value from the GYRO_CONFIG
-        register.
-        If raw is False, it will return 250, 500, 1000, 2000 or -1. If the
-        returned value is equal to -1 something went wrong.
-        """
-        raw_data = self.bus.read_byte_data(self.address, self.GYRO_CONFIG)
+       raw_data = self.bus.read_byte_data(self.address, self.GYRO_CONFIG)
 
         if raw is True:
             return raw_data
@@ -223,10 +173,6 @@ class mpu6050:
                 return -1
 
     def get_gyro_data(self):
-        """
-        Gets and returns the X, Y and Z values from the gyroscope.
-        Returns the read values in a dictionary.
-        """
         x = self.read_i2c_word(self.GYRO_XOUT0)
         y = self.read_i2c_word(self.GYRO_YOUT0)
         z = self.read_i2c_word(self.GYRO_ZOUT0)
@@ -253,7 +199,6 @@ class mpu6050:
         return {'x': x, 'y': y, 'z': z}
 
     def get_all_data(self):
-        """Reads and returns all the available data."""
         temp = self.get_temp()
         accel = self.get_accel_data()
         gyro = self.get_gyro_data()
